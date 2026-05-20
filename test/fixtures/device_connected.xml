@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<eventMessage>
+  <advanNetId>AdvanNet1</advanNetId>
+  <event>
+    <type>ADVANNET_DEVICE_CONNECTED</type>
+    <deviceId>r1</deviceId>
+    <ts>1706265600000</ts>
+  </event>
+</eventMessage>

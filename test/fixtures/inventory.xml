@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<inventory>
+  <deviceId>r1</deviceId>
+  <advanNetId>AdvanNet1</advanNetId>
+  <items>
+    <item>
+      <event>READ_EVENT</event>
+      <epc>E20000165919006017520009</epc>
+      <hexepc>E20000165919006017520009</hexepc>
+      <tid>E2806894200040201890B41A</tid>
+      <props>
+        <TIME_STAMP>1706265600000</TIME_STAMP>
+        <RSSI>-67</RSSI>
+        <RF_PHASE>90</RF_PHASE>
+        <ANTENNA_PORT>1</ANTENNA_PORT>
+        <MUX1>0</MUX1>
+        <MUX2>0</MUX2>
+        <FREQ>865700</FREQ>
+        <GPI>0000</GPI>
+      </props>
+      <locationData>
+        <x>1.0</x>
+        <y>2.5</y>
+        <z>0.0</z>
+      </locationData>
+    </item>
+    <item>
+      <event>READ_EVENT</event>
+      <epc>E20000165919006017520010</epc>
+      <hexepc>E20000165919006017520010</hexepc>
+      <props>
+        <TIME_STAMP>1706265600001</TIME_STAMP>
+        <RSSI>-72</RSSI>
+        <RF_PHASE>45</RF_PHASE>
+        <ANTENNA_PORT>2</ANTENNA_PORT>
+        <MUX1>0</MUX1>
+        <MUX2>0</MUX2>
+        <FREQ>866300</FREQ>
+        <GPI>0000</GPI>
+      </props>
+    </item>
+  </items>
+</inventory>

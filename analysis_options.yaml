@@ -1,0 +1,11 @@
+include: package:lints/recommended.yaml
+plugins:
+  leancode_lint: ^21.0.0
+
+analyzer:
+  errors:
+    always_put_control_body_on_new_line: ignore
+    # Public-named constructor parameters → private fields is an intentional pattern.
+    prefer_initializing_formals: ignore
+  exclude:
+    - '**/*.g.dart'

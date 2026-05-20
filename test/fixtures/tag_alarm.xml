@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<deviceEventMessage>
+  <deviceId>r1</deviceId>
+  <advanNetId>AdvanNet1</advanNetId>
+  <event>
+    <type>TAG_ALARM</type>
+    <epc>E20000165919006017520009</epc>
+    <ts>1706265600000</ts>
+    <alarmType>EPC_EAS</alarmType>
+  </event>
+</deviceEventMessage>

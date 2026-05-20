@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<deviceEventMessage>
+  <deviceId>r1</deviceId>
+  <advanNetId>AdvanNet1</advanNetId>
+  <event>
+    <type>GPI</type>
+    <line>2</line>
+    <value>1</value>
+    <ts>1706265600000</ts>
+  </event>
+</deviceEventMessage>
