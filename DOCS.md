@@ -544,7 +544,18 @@ AdvanNetResponse r = await client.raw.put('/some/path', body: xmlElement);
 
 Connects to TCP port 3177 and decodes frames into typed `RealtimeEvent` objects.
 
-The stream is **lazy**: the TCP connection is established only when you call `updates()` or any filtered stream method for the first time. It reconnects automatically with exponential backoff when the connection drops.
+Call `connect()` to open the TCP socket immediately, or let it open on first use when you subscribe to `updates()` or a filtered stream.
+
+```dart
+// Option A — eager (connection starts now, before any listener)
+client.realtime.connect();
+
+// Option B — on first subscription (default)
+client.realtime.tagReads().listen(...);
+```
+
+On disconnect the driver automatically retries with a linear ramp:  
+1 s → 2 s → 3 s → 4 s → 5 s → 5 s → … (capped at 5 s, deterministic — no jitter).
 
 ### Encoding
 

@@ -13,6 +13,15 @@ final class RealtimeStream {
 
   Stream<RealtimeUpdate>? _updates;
 
+  /// Starts the TCP connection immediately, without requiring a listener.
+  ///
+  /// Useful when you want the connection established before subscribing to
+  /// [updates] or any filtered stream. Safe to call multiple times — the
+  /// connection is only opened once.
+  void connect() {
+    _driver.connect();
+  }
+
   Stream<RealtimeUpdate> updates() {
     return _updates ??= _buildUpdates();
   }

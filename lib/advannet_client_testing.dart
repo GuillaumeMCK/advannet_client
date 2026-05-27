@@ -82,5 +82,8 @@ final class FakeConnectionDriver implements RealtimeDriver {
   }
 
   @override
+  void connect() {}
+
+  @override
   Future<void> close() async => done();
 }

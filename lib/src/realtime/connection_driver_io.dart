@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:io';
-import 'dart:math';
 import 'dart:typed_data';
 
 import 'realtime_driver.dart';
@@ -10,23 +9,20 @@ final class IoConnectionDriver implements RealtimeDriver {
   IoConnectionDriver({
     required String host,
     required int port,
-    Duration initialReconnectDelay = const Duration(seconds: 1),
-    Duration maxReconnectDelay = const Duration(seconds: 30),
+    Duration reconnectStep = const Duration(seconds: 1),
+    Duration maxReconnectDelay = const Duration(seconds: 5),
     int? maxReconnectAttempts,
-    Random? random,
   }) : _host = host,
        _port = port,
-       _initialDelay = initialReconnectDelay,
+       _step = reconnectStep,
        _maxDelay = maxReconnectDelay,
-       _maxAttempts = maxReconnectAttempts,
-       _random = random ?? Random();
+       _maxAttempts = maxReconnectAttempts;
 
   final String _host;
   final int _port;
-  final Duration _initialDelay;
+  final Duration _step;
   final Duration _maxDelay;
   final int? _maxAttempts;
-  final Random _random;
 
   final _byteController = StreamController<Uint8List>.broadcast();
   final _statusController = StreamController<RealtimeStatus>.broadcast();
@@ -37,22 +33,29 @@ final class IoConnectionDriver implements RealtimeDriver {
 
   @override
   Stream<Uint8List> get byteStream {
-    _lazyStart();
+    _start();
     return _byteController.stream;
   }
 
   @override
   Stream<RealtimeStatus> get statusStream {
-    _lazyStart();
+    _start();
     return _statusController.stream;
   }
 
-  void _lazyStart() {
+  void _start() {
     if (!_started && !_closed) {
       _started = true;
       _connectLoop();
     }
   }
+
+  /// Starts the TCP connection loop without subscribing to any stream.
+  ///
+  /// Useful when you want the connection to be established eagerly, before
+  /// any listener is attached to [byteStream] or [statusStream].
+  @override
+  void connect() => _start();
 
   @override
   Future<void> close() async {
@@ -65,7 +68,6 @@ final class IoConnectionDriver implements RealtimeDriver {
 
   Future<void> _connectLoop() async {
     var attempt = 0;
-    var delay = _initialDelay;
 
     while (!_closed) {
       _statusController.add(const Connecting());
@@ -76,6 +78,7 @@ final class IoConnectionDriver implements RealtimeDriver {
           return;
         }
         _socket = socket;
+        attempt = 0;
         _statusController.add(const Connected());
 
         final done = Completer<void>();
@@ -94,8 +97,6 @@ final class IoConnectionDriver implements RealtimeDriver {
 
         await done.future;
         _socket = null;
-        attempt = 0;
-        delay = _initialDelay;
 
         if (_closed) return;
         _statusController.add(Disconnected());
@@ -109,26 +110,23 @@ final class IoConnectionDriver implements RealtimeDriver {
       final max = _maxAttempts;
       if (max != null && attempt >= max) break;
 
-      final jitter = (_random.nextDouble() * 0.5 - 0.25) * delay.inMilliseconds;
-      final jitteredMs = (delay.inMilliseconds + jitter).round().clamp(
-        0,
-        _maxDelay.inMilliseconds,
+      // Linear ramp: 1×step, 2×step, 3×step … capped at maxDelay.
+      // Deterministic and predictable for local hardware — no jitter needed.
+      final nextDelay = Duration(
+        milliseconds:
+            ((attempt + 1) * _step.inMilliseconds).clamp(
+              0,
+              _maxDelay.inMilliseconds,
+            ),
       );
-      final nextDelay = Duration(milliseconds: jitteredMs);
       attempt++;
-      _statusController.add(
-        Reconnecting(attempt: attempt, nextDelay: nextDelay),
-      );
-
+      _statusController.add(Reconnecting(attempt: attempt, nextDelay: nextDelay));
       await Future<void>.delayed(nextDelay);
-
-      final doubled = Duration(milliseconds: delay.inMilliseconds * 2);
-      delay = doubled > _maxDelay ? _maxDelay : doubled;
     }
 
     if (!_closed) {
       _statusController.add(
-        Disconnected(reason: 'Max reconnect attempts reached'),
+        Disconnected(reason: 'max reconnect attempts reached'),
       );
       await _byteController.close();
       await _statusController.close();

@@ -37,7 +37,7 @@ await client.close();
 
 `AdvanNet.connect` returns immediately — no network I/O happens until you make a call.  
 HTTP calls are serialized internally (the AdvanNet server is single-threaded).  
-The realtime TCP connection (port 3177) starts lazily when you first call `updates()` or any filtered stream method such as `tagReads()`.
+Call `client.realtime.connect()` to open the TCP socket eagerly, or let it open on first use when you subscribe. On disconnect it retries on a linear ramp (1 s, 2 s, … capped at 5 s).
 
 ## Authentication
 
